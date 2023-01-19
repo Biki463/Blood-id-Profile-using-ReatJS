@@ -1,18 +1,12 @@
 import React from 'react';
 
-class BloodDonorProfile extends React.Component {
+class BloodDonorForm extends React.Component {
   state = {
     name: '',
     age: '',
     bloodType: '',
-    hasDonated: false,
-    donorId: ''
+    hasDonated: false
   };
-
-  componentDidMount() {
-    // fetch the donor data from the server or another source
-    // and update the state with setState
-  }
 
   handleChange = event => {
     const target = event.target;
@@ -26,7 +20,13 @@ class BloodDonorProfile extends React.Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    // send the form data to the server or do whatever you need to do with it here
+    this.props.onFormSubmit(this.state);
+    this.setState({
+      name: '',
+      age: '',
+      bloodType: '',
+      hasDonated: false
+    });
   };
 
   render() {
@@ -80,20 +80,62 @@ class BloodDonorProfile extends React.Component {
           />
         </label>
         <br />
-        <label>
-          Donor ID:
-          <input
-            type="text"
-            name="donorId"
-            value={this.state.donorId}
-            onChange={this.handleChange}
-          />
-        </label>
-        <br />
-        <button type="submit">Save</button>
+        <button type="submit">Submit</button>
       </form>
+  
     );
   }
 }
 
-export default BloodDonorProfile;
+
+
+const BloodDonorProfileTable = ({ donorProfiles }) => (
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Blood Type</th>
+        <th>Donor ID</th>
+        <th>Has Donated Before</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+  {donorProfiles.map((profile, index) => (
+    <tr key={index}>
+      <td>{profile.name}</td>
+      <td>{profile.age}</td>
+      <td>{profile.bloodType}</td>
+      <td>{index + 1}</td>
+      <td>{profile.hasDonated ? 'Yes' : 'No'}</td>
+    </tr>
+  ))}
+</tbody>
+</table>
+);
+
+class BloodDonorApp extends React.Component {
+state = {
+donorProfiles: []
+};
+
+handleFormSubmit = donorInfo => {
+this.setState(prevState => ({
+  donorProfiles: [...prevState.donorProfiles, donorInfo]
+}));
+};
+
+render() {
+return (
+  <div>
+    <h1>Blood Donor App</h1>
+    <BloodDonorForm onFormSubmit={this.handleFormSubmit} />
+    <BloodDonorProfileTable donorProfiles={this.state.donorProfiles} />
+  </div>
+);
+}
+}
+
+
+export default BloodDonorApp;
